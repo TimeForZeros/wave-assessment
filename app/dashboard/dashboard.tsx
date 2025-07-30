@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+
+import { useQuery } from "@tanstack/react-query";
 
 type User = {
   id: number;
@@ -10,21 +11,28 @@ type User = {
 const UserItem = ({userData}: { userData: User }) => <li>{userData.username}</li>
 
 const Dashboard = () => {
-  const [users, setUsers] = useState<User[]>([]);
+  const { data: users = [], isPending } = useQuery<User[]>({
+    queryKey: ["users"],
+    queryFn: async () => {
+      const res = await fetch('https://jsonplaceholder.typicode.com/users');
+      return res.json();
+    },
+  });
 
-  useEffect(() => {
-    fetch('https://jsonplaceholder.typicode.com/users')
-      .then((res) => res.json())
-      .then(setUsers);
-  }, []);
+  if (isPending) {
+    return <div>Loading...</div>;
+  }
 
-
-  return (<div>
-    <h1>Dashboard</h1>
-    <ul>
-      {users.length > 0 && users.map((user) => <UserItem userData={user} />)}
-    </ul>
-  </div>)
+  return (
+    <div>
+      <h1>Dashboard</h1>
+      <ul>
+        {users.map((user) => (
+          <UserItem key={user.id} userData={user} />
+        ))}
+      </ul>
+    </div>
+  );
 };
 
 export default Dashboard;
