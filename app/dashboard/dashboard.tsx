@@ -1,4 +1,4 @@
-import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import {
   useReactTable,
   getCoreRowModel,
@@ -7,7 +7,6 @@ import {
   flexRender,
   createColumnHelper,
 } from '@tanstack/react-table';
-import { useState, useMemo } from 'react';
 import {
   Table,
   TableHeader,
@@ -18,6 +17,7 @@ import {
 } from '../components/ui/table';
 import type { SortingState } from '@tanstack/react-table';
 import { ChevronUp, ChevronDown } from 'lucide-react';
+import { create } from 'zustand';
 
 type User = {
   id: number;
@@ -25,6 +25,22 @@ type User = {
   username: string;
   email: string;
 };
+
+// move all of this to a dedicated store file for reuse
+type TableState = {
+  globalFilter: string;
+  setGlobalFilter: (filter: string) => void;
+  sorting: SortingState;
+  setSorting: (sorting: SortingState) => void;
+};
+
+// slice slice slice!
+const useTableStore = create<TableState>((set) => ({
+  globalFilter: '',
+  setGlobalFilter: (filter) => set({ globalFilter: filter }),
+  sorting: [],
+  setSorting: (sorting) => set({ sorting }),
+}));
 
 const Dashboard = () => {
   const { data: users = [], isPending } = useSuspenseQuery<User[]>({
@@ -34,6 +50,11 @@ const Dashboard = () => {
       return res.json();
     },
   });
+
+  const globalFilter = useTableStore((state) => state.globalFilter);
+  const setGlobalFilter = useTableStore((state) => state.setGlobalFilter);
+  const sorting = useTableStore((state) => state.sorting);
+  const setSorting = useTableStore((state) => state.setSorting);
 
   const columnHelper = createColumnHelper<User>();
   const columns = [
@@ -59,10 +80,6 @@ const Dashboard = () => {
     return <div>Loading...</div>;
   }
 
-  const [globalFilter, setGlobalFilter] = useState('');
-
-  const [sorting, setSorting] = useState<SortingState>([]);
-
   const table = useReactTable({
     data: users,
     columns,
@@ -71,7 +88,10 @@ const Dashboard = () => {
       sorting,
     },
     onGlobalFilterChange: setGlobalFilter,
-    onSortingChange: setSorting,
+    onSortingChange: (updaterOrValue) =>
+      typeof updaterOrValue === 'function'
+        ? setSorting(updaterOrValue(sorting))
+        : setSorting(updaterOrValue),
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
