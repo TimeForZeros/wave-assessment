@@ -1,5 +1,23 @@
-
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
+import {
+  useReactTable,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getSortedRowModel,
+  flexRender,
+  createColumnHelper,
+} from '@tanstack/react-table';
+import { useState, useMemo } from 'react';
+import {
+  Table,
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+} from '../components/ui/table';
+import type { SortingState } from '@tanstack/react-table';
+import { ChevronUp, ChevronDown } from 'lucide-react';
 
 type User = {
   id: number;
@@ -8,29 +26,101 @@ type User = {
   email: string;
 };
 
-const UserItem = ({userData}: { userData: User }) => <li>{userData.username}</li>
-
 const Dashboard = () => {
-  const { data: users = [], isPending } = useQuery<User[]>({
-    queryKey: ["users"],
+  const { data: users = [], isPending } = useSuspenseQuery<User[]>({
+    queryKey: ['users'],
     queryFn: async () => {
       const res = await fetch('https://jsonplaceholder.typicode.com/users');
       return res.json();
     },
   });
 
+  const columnHelper = createColumnHelper<User>();
+  const columns = [
+    columnHelper.accessor('id', {
+      header: 'ID',
+      cell: (info) => info.getValue(),
+    }),
+    columnHelper.accessor('name', {
+      header: 'Name',
+      cell: (info) => info.getValue(),
+    }),
+    columnHelper.accessor('username', {
+      header: 'Username',
+      cell: (info) => info.getValue(),
+    }),
+    columnHelper.accessor('email', {
+      header: 'Email',
+      cell: (info) => info.getValue(),
+    }),
+  ];
+
   if (isPending) {
     return <div>Loading...</div>;
   }
 
+  const [globalFilter, setGlobalFilter] = useState('');
+
+  const [sorting, setSorting] = useState<SortingState>([]);
+
+  const table = useReactTable({
+    data: users,
+    columns,
+    state: {
+      globalFilter,
+      sorting,
+    },
+    onGlobalFilterChange: setGlobalFilter,
+    onSortingChange: setSorting,
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    globalFilterFn: (row, columnId, filterValue) => {
+      return String(row.getValue(columnId)).toLowerCase().includes(filterValue.toLowerCase());
+    },
+  });
+
   return (
     <div>
-      <h1>Dashboard</h1>
-      <ul>
-        {users.map((user) => (
-          <UserItem key={user.id} userData={user} />
-        ))}
-      </ul>
+      <input
+        value={globalFilter}
+        onChange={(e) => setGlobalFilter(e.target.value)}
+        placeholder='Search users...'
+        className='mb-4 p-2 border rounded'
+      />
+      <Table>
+        <TableHeader>
+          <TableRow>
+            {table.getHeaderGroups()[0].headers.map((header) => (
+              <TableHead
+                key={header.id}
+                onClick={
+                  header.column.getCanSort() ? () => header.column.toggleSorting() : undefined
+                }
+                className={header.column.getCanSort() ? 'cursor-pointer select-none' : ''}
+              >
+                <div className='flex px-1 align-bottom'>
+                  {flexRender(header.column.columnDef.header, header.getContext())}
+                  {/* TODO: check different rem values to ensure consistency */}
+                  {header.column.getIsSorted() === 'asc' && <ChevronUp size={20} />}
+                  {header.column.getIsSorted() === 'desc' && <ChevronDown size={20} />}
+                </div>
+              </TableHead>
+            ))}
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {table.getRowModel().rows.map((row) => (
+            <TableRow key={row.id}>
+              {row.getVisibleCells().map((cell) => (
+                <TableCell key={cell.id}>
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </TableCell>
+              ))}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 };
