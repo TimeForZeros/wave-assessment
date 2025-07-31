@@ -87,8 +87,9 @@ const Dashboard = () => {
         onChange={(e) => setGlobalFilter(e.target.value)}
         placeholder='Search users...'
         className='mb-4 p-2 border rounded'
+        aria-label='Search users'
       />
-      <Table>
+      <Table aria-label='User data table'>
         <TableHeader>
           <TableRow>
             {table.getHeaderGroups()[0].headers.map((header) => (
@@ -98,12 +99,24 @@ const Dashboard = () => {
                   header.column.getCanSort() ? () => header.column.toggleSorting() : undefined
                 }
                 className={header.column.getCanSort() ? 'cursor-pointer select-none' : ''}
+                aria-sort={
+                  header.column.getIsSorted() === 'asc'
+                    ? 'ascending'
+                    : header.column.getIsSorted() === 'desc'
+                    ? 'descending'
+                    : 'none'
+                }
+                tabIndex={header.column.getCanSort() ? 0 : undefined}
+                role='columnheader'
               >
                 <div className='flex px-1 align-bottom'>
                   {flexRender(header.column.columnDef.header, header.getContext())}
-                  {/* TODO: check different rem values to ensure consistency */}
-                  {header.column.getIsSorted() === 'asc' && <ChevronUp size={20} />}
-                  {header.column.getIsSorted() === 'desc' && <ChevronDown size={20} />}
+                  {header.column.getIsSorted() === 'asc' && (
+                    <ChevronUp size={20} aria-hidden='true' />
+                  )}
+                  {header.column.getIsSorted() === 'desc' && (
+                    <ChevronDown size={20} aria-hidden='true' />
+                  )}
                 </div>
               </TableHead>
             ))}
@@ -111,9 +124,9 @@ const Dashboard = () => {
         </TableHeader>
         <TableBody>
           {table.getRowModel().rows.map((row) => (
-            <TableRow key={row.id}>
+            <TableRow key={row.id} role='row'>
               {row.getVisibleCells().map((cell) => (
-                <TableCell key={cell.id}>
+                <TableCell key={cell.id} role='cell'>
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </TableCell>
               ))}
