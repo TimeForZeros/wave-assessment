@@ -22,16 +22,16 @@ import { useEffect } from 'react';
 
 const Dashboard = () => {
   // might look like overkill to use tanstack query and zustand for this, but assuming a real scenario for fetching, this is how I'd do it.
-  const { isPending } = useSuspenseQuery<User[]>({
-    queryKey: ['users'],
-    queryFn: async () => {
-      const res = await fetch('https://jsonplaceholder.typicode.com/users');
-      const userData = await res.json();
-      // wouldn't normally do this, but since adding users is local, this is a workaround to not invalidate to refetch
-      useStore.getState().setUsers(userData);
-      return userData;
-    },
-  });
+  // const { isPending } = useSuspenseQuery<User[]>({
+  //   queryKey: ['users'],
+  //   queryFn: async () => {
+  //     const res = await fetch('https://jsonplaceholder.typicode.com/users');
+  //     const userData = await res.json();
+  //     // wouldn't normally do this, but since adding users is local, this is a workaround to not invalidate to refetch
+  //     useStore.getState().setUsers(userData);
+  //     return userData;
+  //   },
+  // });
 
   const globalFilter = useStore((state) => state.globalFilter);
   const setGlobalFilter = useStore((state) => state.setGlobalFilter);
@@ -58,9 +58,9 @@ const Dashboard = () => {
     }),
   ];
 
-  if (isPending) {
-    return <div>Loading...</div>;
-  }
+  // if (isPending) {
+  //   return <div>Loading...</div>;
+  // }
 
   const table = useReactTable({
     data: useStore((state) => state.users),
