@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import type { User } from './definitions';
 import {
   Dialog,
   DialogContent,
@@ -35,7 +34,6 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 const Modal = () => {
-  const addUser = useStore((state) => state.addUser);
   const [open, setOpen] = useState(false);
 
   const form = useForm<FormValues>({
@@ -44,7 +42,8 @@ const Modal = () => {
   });
 
   const onSubmit = (values: FormValues) => {
-    addUser(values);
+    // addUser(values);
+    useStore((state) => state.addUser(values))
     form.reset();
     setOpen(false);
   };

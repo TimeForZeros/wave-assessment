@@ -1,4 +1,5 @@
 import type { SortingState } from '@tanstack/react-table';
+import { type StateCreator } from 'zustand';
 
 export interface TableSlice {
   globalFilter: string;
@@ -6,8 +7,6 @@ export interface TableSlice {
   sorting: SortingState;
   setSorting: (sorting: SortingState) => void;
 }
-
-export type SetState<T> = (partial: Partial<T>) => void;
 
 export type User = {
   id: number;
@@ -17,31 +16,27 @@ export type User = {
 };
 
 export interface TableSlice {
+  globalFilter: string,
   users: User[];
+  sorting: SortingState;
+  setGlobalFilter: (filter: string) => void;
   setUsers: (updatedUsers: User[]) => void;
-  addUser: (newUser: User) => void;
+  setSorting: (sorting: SortingState) => void;
+  addUser: (newUser: Omit<User, 'id'>) => void;
 }
 
-export const createTableSlice = (set: SetState<TableSlice>): TableSlice => ({
+export const createTableSlice: StateCreator<TableSlice> = (set, get, store): TableSlice => ({
   globalFilter: '',
   sorting: [],
-  setGlobalFilter: (filter: string) => set({ globalFilter: filter }),
+  setGlobalFilter: (filter) => set({ globalFilter: filter }),
   users: [],
-  setSorting: (sorting: SortingState) => set({ sorting }),
+  setSorting: (sorting) => set({ sorting }),
   setUsers: (userArr) =>
     set({
       users: userArr,
     }),
-
-addUser: (userFormData: User) => set((state) => ({
-      users: [...state.users, { ...userFormData, id: state.users.length + 1 }],
-    })),
+  addUser: (userFormData) =>
+    set({
+      users: [...get().users, { ...userFormData, id: get().users.length + 1 }],
+    }),
 });
-
-
-  // addUser: (userFormData: User) =>
-  //   set((state: UsersState) => {
-  //     return {
-  //       users: [...state.users, { ...userFormData, id: state.users.length + 1 }],
-  //     };
-  //   }),

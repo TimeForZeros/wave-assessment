@@ -17,8 +17,7 @@ import {
 } from '../components/ui/table';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 import Modal from './add-user-modal';
-import useStore from '../store';
-import type { User } from '../store';
+import useStore, { type User } from '../store';
 import { useEffect } from 'react';
 
 const Dashboard = () => {

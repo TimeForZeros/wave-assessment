@@ -1,8 +1,10 @@
 import { create } from 'zustand';
-import { createTableSlice } from './table-slice';
+import { createTableSlice, type TableSlice } from './table-slice';
+export { type User } from './table-slice';
+export type GlobalState = TableSlice;
 
-const useStore = create((set) => ({
-  ...createTableSlice(set),
+const useStore = create<GlobalState>()((set, get, store) => ({
+  ...createTableSlice(set, get, store),
 }));
 
 export default useStore;
