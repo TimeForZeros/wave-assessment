@@ -85,7 +85,7 @@ const UserForm = ({
         </div>
         {/* TODO: semantically suboptimal, but fuck it, it works! fix if time */}
         <DialogFooter className='mt-4'>
-          <Button type='button' variant='outline' onClick={() => handleModalSetOpen(false)}>
+          <Button type='button' variant='outline' onClick={() => handleSubmission()}>
             Cancel
           </Button>
           <Button type='submit'>Add</Button>

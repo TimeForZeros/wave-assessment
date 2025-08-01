@@ -16,7 +16,9 @@ export type User = {
 };
 
 export interface TableSlice {
-  globalFilter: string,
+  globalFilter: string;
+  localUsers: User[];
+  fetchedUsers: User[];
   users: User[];
   sorting: SortingState;
   setGlobalFilter: (filter: string) => void;
@@ -28,15 +30,20 @@ export interface TableSlice {
 export const createTableSlice: StateCreator<TableSlice> = (set, get, store): TableSlice => ({
   globalFilter: '',
   sorting: [],
+  localUsers: [],
+  fetchedUsers: [],
   setGlobalFilter: (filter) => set({ globalFilter: filter }),
   users: [],
   setSorting: (sorting) => set({ sorting }),
   setUsers: (userArr) =>
     set({
-      users: userArr,
+      fetchedUsers: [...userArr],
+      users: [...userArr, ...get().localUsers],
     }),
-  addUser: (userFormData) =>
+  addUser: (userFormData) => {
+    set({ localUsers: [...get().localUsers, { ...userFormData, id: get().users.length + 1 }] });
     set({
-      users: [...get().users, { ...userFormData, id: get().users.length + 1 }],
-    }),
+      users: [...get().fetchedUsers, ...get().localUsers],
+    });
+  },
 });
