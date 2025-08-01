@@ -16,11 +16,11 @@ import {
   TableHead,
   TableBody,
   TableCell,
-} from '../components/ui/table';
+} from '../ui/table';
 import { ChevronUp, ChevronDown } from 'lucide-react';
-import useStore, { type User } from '../store';
-import { ScrollArea, ScrollBar } from '../components/ui/scroll-area';
-import UserDetailModal from './user-detail-modal';
+import useStore, { type User } from '../../store';
+import { ScrollArea, ScrollBar } from '../ui/scroll-area';
+import UserDetailModal from '../../dashboard/user-detail-modal';
 
 const UserTable = () => {
   // might look like overkill to use tanstack query and zustand for this, but assuming a real scenario for fetching, this is how I'd do it.

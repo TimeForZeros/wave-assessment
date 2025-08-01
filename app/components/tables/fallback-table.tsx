@@ -1,4 +1,3 @@
-import { Card, CardContent, CardHeader, CardDescription, CardTitle } from '../components/ui/card';
 import {
   Table,
   TableHeader,
@@ -6,11 +5,9 @@ import {
   TableHead,
   TableBody,
   TableCell,
-} from '../components/ui/table';
-import { Loader2 } from 'lucide-react';
+} from '../../components/ui/table';
 
 const FallbackTable = () => {
-  // Define the same columns to maintain a consistent layout
   const columns = [
     { accessorKey: 'name', header: 'Name' },
     { accessorKey: 'username', header: 'Ussername' },
@@ -19,15 +16,8 @@ const FallbackTable = () => {
   ];
 
   return (
-    // <Card className='w-full'>
-    //   <CardHeader>
-    //     <CardTitle>User Data</CardTitle>
-    //     <CardDescription>Loading user data...</CardDescription>
-    //   </CardHeader>
-    //   <CardContent>
-        <Table className='mt-4'>
+        <Table className='h-[50vh]'>
           <TableHeader>
-            {/* Render header with skeleton look */}
             <TableRow>
               {columns.map((column, index) => (
                 <TableHead key={index}>
@@ -49,12 +39,6 @@ const FallbackTable = () => {
             ))}
           </TableBody>
         </Table>
-    //     <div className='flex items-center justify-center p-4'>
-    //       <Loader2 className='h-6 w-6 animate-spin mr-2' />
-    //       <span className='text-sm text-gray-500'>Loading...</span>
-    //     </div>
-    //   </CardContent>
-    // </Card>
   );
 };
 

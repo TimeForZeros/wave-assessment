@@ -1,9 +1,9 @@
 import { Suspense, lazy } from 'react';
 import { Card, CardContent, CardFooter, CardHeader } from '../components/ui/card';
 import AddUserModal from './add-user-modal';
-import FallbackTable from './fallbackTable';
+import FallbackTable from '../components/tables/fallback-table';
 
-const UserTable = lazy(() => import('./user-table'));
+const UserTable = lazy(() => import('../components/tables/user-table'));
 
 const Dashboard = () => {
   return (
