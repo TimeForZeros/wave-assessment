@@ -8,7 +8,7 @@ import {
 } from '../components/ui/navigation-menu';
 
 const NavBar = () => (
-  <header className='w-full flex justify-between bg-slate-700 py-3 sticky'>
+  <div className='w-full flex justify-between bg-slate-700 py-3 sticky'>
     <NavigationMenu viewport={false} className='mx-auto'>
       <NavigationMenuList>
         <NavigationMenuItem>
@@ -19,6 +19,6 @@ const NavBar = () => (
         </NavigationMenuItem>
       </NavigationMenuList>
     </NavigationMenu>
-  </header>
+  </div>
 );
 export default NavBar
