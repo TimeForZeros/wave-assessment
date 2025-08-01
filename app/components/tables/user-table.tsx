@@ -9,14 +9,7 @@ import {
   flexRender,
   createColumnHelper,
 } from '@tanstack/react-table';
-import {
-  Table,
-  TableHeader,
-  TableRow,
-  TableHead,
-  TableBody,
-  TableCell,
-} from '../ui/table';
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '../ui/table';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 import useStore, { type User } from '../../store';
 import { ScrollArea, ScrollBar } from '../ui/scroll-area';
@@ -27,11 +20,13 @@ const UserTable = () => {
   useSuspenseQuery<User[]>({
     queryKey: ['users'],
     queryFn: async () => {
-      const res = await fetch('https://jsonplaceholder.typicode.com/users');
-      const userData = await res.json();
-      // wouldn't normally do this, but since adding users is local, this is a workaround to not invalidate to refetch
-      useStore.getState().setUsers(userData);
-      return userData;
+      let fetchedUsers = useStore.getState().fetchedUsers;
+      if (!fetchedUsers.length) {
+        const res = await fetch('https://jsonplaceholder.typicode.com/users');
+        fetchedUsers = await res.json();
+      }
+      useStore.getState().setUsers(fetchedUsers);
+      return fetchedUsers;
     },
     staleTime: Infinity,
   });

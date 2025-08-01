@@ -12,6 +12,7 @@ const useStore = create<GlobalState>()(
     name: 'local-users', // This is the key in localStorage
     storage: createJSONStorage(() => localStorage),
     partialize: (state) => ({
+      fetchedUsers: state.fetchedUsers,
       localUsers: state.localUsers,
     }),
   }),
