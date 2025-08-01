@@ -15,46 +15,29 @@ import {
   TableBody,
   TableCell,
 } from '../components/ui/table';
-import type { SortingState } from '@tanstack/react-table';
 import { ChevronUp, ChevronDown } from 'lucide-react';
-import { create } from 'zustand';
-
-type User = {
-  id: number;
-  name: string;
-  username: string;
-  email: string;
-};
-
-// move all of this to a dedicated store file for reuse
-type TableState = {
-  globalFilter: string;
-  setGlobalFilter: (filter: string) => void;
-  sorting: SortingState;
-  setSorting: (sorting: SortingState) => void;
-};
-
-// slice slice slice!
-const useTableStore = create<TableState>((set) => ({
-  globalFilter: '',
-  setGlobalFilter: (filter) => set({ globalFilter: filter }),
-  sorting: [],
-  setSorting: (sorting) => set({ sorting }),
-}));
+import Modal from './add-user-modal';
+import useStore from '../store';
+import type { User } from '../store';
+import { useEffect } from 'react';
 
 const Dashboard = () => {
-  const { data: users = [], isPending } = useSuspenseQuery<User[]>({
+  // might look like overkill to use tanstack query and zustand for this, but assuming a real scenario for fetching, this is how I'd do it.
+  const { isPending } = useSuspenseQuery<User[]>({
     queryKey: ['users'],
     queryFn: async () => {
       const res = await fetch('https://jsonplaceholder.typicode.com/users');
-      return res.json();
+      const userData = await res.json();
+      // wouldn't normally do this, but since adding users is local, this is a workaround to not invalidate to refetch
+      useStore.getState().setUsers(userData);
+      return userData;
     },
   });
 
-  const globalFilter = useTableStore((state) => state.globalFilter);
-  const setGlobalFilter = useTableStore((state) => state.setGlobalFilter);
-  const sorting = useTableStore((state) => state.sorting);
-  const setSorting = useTableStore((state) => state.setSorting);
+  const globalFilter = useStore((state) => state.globalFilter);
+  const setGlobalFilter = useStore((state) => state.setGlobalFilter);
+  const sorting = useStore((state) => state.sorting);
+  const setSorting = useStore((state) => state.setSorting);
 
   const columnHelper = createColumnHelper<User>();
   const columns = [
@@ -81,7 +64,7 @@ const Dashboard = () => {
   }
 
   const table = useReactTable({
-    data: users,
+    data: useStore((state) => state.users),
     columns,
     state: {
       globalFilter,
@@ -102,6 +85,7 @@ const Dashboard = () => {
 
   return (
     <div>
+      <Modal />
       <input
         value={globalFilter}
         onChange={(e) => setGlobalFilter(e.target.value)}
@@ -159,3 +143,5 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
+// useStore.getState().setUsers(userData);
