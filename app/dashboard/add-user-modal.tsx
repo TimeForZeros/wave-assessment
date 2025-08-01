@@ -9,7 +9,7 @@ import {
 import { Button } from '../components/ui/button';
 import UserForm from '~/components/forms/add-user-form';
 
-const Modal = () => {
+const AddUserModal = () => {
   const [open, setOpen] = useState(false);
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -26,4 +26,4 @@ const Modal = () => {
   );
 };
 
-export default Modal;
+export default AddUserModal;

@@ -19,7 +19,7 @@ import {
   TableCell,
 } from '../components/ui/table';
 import { ChevronUp, ChevronDown } from 'lucide-react';
-import Modal from './add-user-modal';
+import AddUserModal from './add-user-modal';
 import useStore, { type User } from '../store';
 import { ScrollArea, ScrollBar } from '../components/ui/scroll-area';
 import UserDetailModal from './user-detail-modal';
@@ -160,7 +160,7 @@ const Dashboard = () => {
           <UserTable />
         </CardContent>
         <CardFooter>
-          <Modal />
+          <AddUserModal />
         </CardFooter>
       </Card>
     </div>
