@@ -1,7 +1,6 @@
 import { create, type StateCreator } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { createTableSlice, type TableSlice } from './table-slice';
-export { type User } from './table-slice';
 export type GlobalState = TableSlice;
 
 const aggregateSlices: StateCreator<GlobalState, []> = (set, get, store) => ({

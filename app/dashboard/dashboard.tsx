@@ -22,6 +22,7 @@ import { ChevronUp, ChevronDown } from 'lucide-react';
 import Modal from './add-user-modal';
 import useStore, { type User } from '../store';
 import { ScrollArea, ScrollBar } from '../components/ui/scroll-area';
+import UserDetailModal from './user-detail-modal';
 
 const UserTable = () => {
   // might look like overkill to use tanstack query and zustand for this, but assuming a real scenario for fetching, this is how I'd do it.
@@ -30,6 +31,7 @@ const UserTable = () => {
     queryFn: async () => {
       const res = await fetch('https://jsonplaceholder.typicode.com/users');
       const userData = await res.json();
+      console.log(userData);
       // wouldn't normally do this, but since adding users is local, this is a workaround to not invalidate to refetch
       useStore.getState().setUsers(userData);
       return userData;
@@ -56,6 +58,11 @@ const UserTable = () => {
       columnHelper.accessor('email', {
         header: 'Email',
         cell: (info) => info.getValue(),
+      }),
+      columnHelper.display({
+        id: 'actions', // A unique ID is required for a display column
+        header: 'Actions',
+        cell: (props) => <UserDetailModal user={props.row.original} />,
       }),
     ],
     [],
@@ -90,55 +97,55 @@ const UserTable = () => {
         aria-label='Search users'
       />
       <ScrollArea className='h-[50vh] min-w-[400px] max-w-screen whitespace-nowrap rounded-md border'>
-          <Table aria-label='User data table'>
-            <TableHeader className='sticky top-0 z-10 bg-white dark:bg-gray-900'>
-              <TableRow>
-                {table.getHeaderGroups()[0].headers.map((header) => (
-                  <TableHead
-                    key={header.id}
-                    onClick={
-                      header.column.getCanSort() ? () => header.column.toggleSorting() : undefined
-                    }
-                    className={clsx(
-                      'min-w-[4rem]',
-                      header.column.getCanSort() ? 'cursor-pointer select-none' : '',
+        <Table aria-label='User data table'>
+          <TableHeader>
+            <TableRow>
+              {table.getHeaderGroups()[0].headers.map((header) => (
+                <TableHead
+                  key={header.id}
+                  onClick={
+                    header.column.getCanSort() ? () => header.column.toggleSorting() : undefined
+                  }
+                  className={clsx(
+                    'min-w-[4rem]',
+                    header.column.getCanSort() ? 'cursor-pointer select-none' : '',
+                  )}
+                  aria-sort={
+                    header.column.getIsSorted() === 'asc'
+                      ? 'ascending'
+                      : header.column.getIsSorted() === 'desc'
+                      ? 'descending'
+                      : 'none'
+                  }
+                  tabIndex={header.column.getCanSort() ? 0 : undefined}
+                  role='columnheader'
+                >
+                  <div className='flex px-1 align-bottom'>
+                    {flexRender(header.column.columnDef.header, header.getContext())}
+                    {header.column.getIsSorted() === 'asc' && (
+                      <ChevronUp size={20} aria-hidden='true' />
                     )}
-                    aria-sort={
-                      header.column.getIsSorted() === 'asc'
-                        ? 'ascending'
-                        : header.column.getIsSorted() === 'desc'
-                        ? 'descending'
-                        : 'none'
-                    }
-                    tabIndex={header.column.getCanSort() ? 0 : undefined}
-                    role='columnheader'
-                  >
-                    <div className='flex px-1 align-bottom'>
-                      {flexRender(header.column.columnDef.header, header.getContext())}
-                      {header.column.getIsSorted() === 'asc' && (
-                        <ChevronUp size={20} aria-hidden='true' />
-                      )}
-                      {header.column.getIsSorted() === 'desc' && (
-                        <ChevronDown size={20} aria-hidden='true' />
-                      )}
-                    </div>
-                  </TableHead>
+                    {header.column.getIsSorted() === 'desc' && (
+                      <ChevronDown size={20} aria-hidden='true' />
+                    )}
+                  </div>
+                </TableHead>
+              ))}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows.map((row) => (
+              <TableRow key={row.id} role='row'>
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id} role='cell' className='min-w-[4rem]'>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
                 ))}
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} role='row'>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} role='cell' className='min-w-[4rem]'>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          <ScrollBar orientation='horizontal' />
+            ))}
+          </TableBody>
+        </Table>
+        <ScrollBar orientation='horizontal' />
       </ScrollArea>
     </>
   );
@@ -146,8 +153,8 @@ const UserTable = () => {
 
 const Dashboard = () => {
   return (
-    <div className='w-screen h-screen flex'>
-      <Card className='min-w-[450px] w-[90vw] max-w-[70rem] mx-auto my-auto'>
+    <div className='w-screen h-[100vh - 3rem] flex'>
+      <Card className='min-w-[450px] w-[90vw] max-w-[70rem] mx-auto mt-6'>
         <CardHeader className='text-4xl font-bold justify-around'>Users Table</CardHeader>
         <CardContent>
           <UserTable />
@@ -161,5 +168,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-
-// useStore.getState().setUsers(userData);
